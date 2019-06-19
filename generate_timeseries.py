@@ -15,7 +15,6 @@ import pickle
 import matplotlib.pyplot as plt
 import matplotlib.image
 import torch
-from lib.gaussian_process import GaussianProcess
 
 # ======================================================================================
 
@@ -54,11 +53,7 @@ def assign_value_or_sample(value, sampling_interval = [0.,1.]):
 		return value
 
 class TimeSeries:
-	def __init__(self, 
-		noise_generator = GaussianProcess(1., "WienerProcess"), 
-		device = torch.device("cpu")):
-
-		self.noise_generator = noise_generator
+	def __init__(self, device = torch.device("cpu")):
 		self.device = device
 		self.z0 = None
 
@@ -74,13 +69,13 @@ class TimeSeries:
 		n_samples = traj_list.size(0)
 
 		# Add noise to all the points except the first point
-		noise = self.noise_generator.sample_multidim(time_steps.numpy()[1:], dim = n_samples)
-		noise = torch.Tensor(np.transpose(noise)).to(self.device)
+		n_tp = len(time_steps) - 1
+		noise = np.random.sample((n_samples, n_tp))
+		noise = torch.Tensor(noise).to(self.device)
 
 		traj_list_w_noise = traj_list.clone()
 		# Dimension [:,:,0] is a time dimension -- do not add noise to that
 		traj_list_w_noise[:,1:,1] += noise_weight * noise
-		self.noise_generator.clear()
 		return traj_list_w_noise
 
 
@@ -88,13 +83,12 @@ class Periodic_1d(TimeSeries):
 	def __init__(self, device = torch.device("cpu"), 
 		init_freq = 0.5, init_amplitude = 1.,
 		final_amplitude = 10., final_freq = 1., 
-		noise_generator = GaussianProcess(1., "WienerProcess"),
 		z0 = 0.):
 		"""
 		If some of the parameters (init_freq, init_amplitude, final_amplitude, final_freq) is not provided, it is randomly sampled.
 		For now, all the time series share the time points and the starting point.
 		"""
-		super(Periodic_1d, self).__init__(noise_generator, device)
+		super(Periodic_1d, self).__init__(device)
 		
 		self.init_freq = init_freq
 		self.init_amplitude = init_amplitude
@@ -125,7 +119,6 @@ class Periodic_1d(TimeSeries):
 		traj_list = np.array(traj_list)
 		traj_list = torch.Tensor().new_tensor(traj_list, device = self.device)
 
-		if self.noise_generator is not None:
-			traj_list = self.add_noise(traj_list, time_steps, noise_weight)
+		traj_list = self.add_noise(traj_list, time_steps, noise_weight)
 		return traj_list
 

@@ -90,21 +90,6 @@ class GRU_unit(nn.Module):
 		return new_y, new_y_std
 
 
-def check_t0(t0, gt_time_steps):
-	if t0 is None:
-		t0 = gt_time_steps[0]
-		run_backwards = True
-	elif t0 <= gt_time_steps[0]:
-		run_backwards = True
-	elif t0 >= gt_time_steps[-1]:
-		run_backwards = False
-	else:
-		raise Exception("Error: t0 provided to ODE Combine must be "
-			"either before or after any observed time point.")
-	return t0, run_backwards
-
-
-
 class Encoder_z0_RNN(nn.Module):
 	def __init__(self, latent_dim, input_dim, lstm_output_size = 20, 
 		use_delta_t = True, device = torch.device("cpu")):
@@ -130,12 +115,21 @@ class Encoder_z0_RNN(nn.Module):
 			self.input_dim += 1
 		self.gru_rnn = GRU(self.input_dim, self.gru_rnn_output_size).to(device)
 
-	def forward(self, gt_data, gt_time_steps, mask = None, t0 = None):
+	def forward(self, gt_data, gt_time_steps, mask = None, run_backwards = True):
 		# gt_data shape: [n_traj, n_tp, n_dims]
 		# shape required for rnn: (seq_len, batch, input_size)
 		# t0: not used here
 		n_traj = gt_data.size(0)
 		
+
+
+
+		print("\nrun_backwards")
+		print(run_backwards)
+
+
+
+
 		assert(not torch.isnan(gt_data).any())
 		assert(not torch.isnan(gt_time_steps).any())
 
@@ -146,8 +140,6 @@ class Encoder_z0_RNN(nn.Module):
 		if mask is not None:
 			mask = mask.permute(1,0,2) 
 			data = torch.cat((data, mask), -1)
-
-		t0, run_backwards = check_t0(t0, gt_time_steps)
 
 		if run_backwards:
 			# Look at data in the reverse order: from later points to the first
@@ -224,11 +216,15 @@ class Encoder_z0_ODE_RNN(nn.Module):
 		utils.init_network_weights(self.transform_z0)
 
 
-	def forward(self, gt_data, gt_time_steps, t0 = None, save_info = False):
+	def forward(self, gt_data, gt_time_steps, run_backwards = True, save_info = False):
 		# gt_data, gt_time_steps -- observations and their time stamps
 		# t0 -- time stamp of z0 which we are making the encoding for
 		# t0 must be either before or after any point within gt_time_steps
 	
+		print("\nrun_backwards")
+		print(run_backwards)
+
+
 		n_traj, n_tp, n_dims = gt_data.size()
 		if len(gt_time_steps) == 1:
 			prev_y = torch.zeros((1, n_traj, self.latent_dim)).to(self.device)
@@ -240,8 +236,8 @@ class Encoder_z0_ODE_RNN(nn.Module):
 			extra_info = None
 		else:
 			
-			last_yi, last_yi_std, _, extra_info = self.run_ode_combine(
-				gt_data, gt_time_steps, t0 = t0, 
+			last_yi, last_yi_std, _, extra_info = self.run_odernn(
+				gt_data, gt_time_steps, run_backwards = run_backwards,
 				save_info = save_info)
 
 		means_z0 = last_yi.reshape(1, n_traj, self.latent_dim)
@@ -251,17 +247,28 @@ class Encoder_z0_ODE_RNN(nn.Module):
 		std_z0 = std_z0.abs()
 		if save_info:
 			self.extra_info = extra_info
+
+			print("save_info")
+			print(extra_info)
+
 		return mean_z0, std_z0
 
 
-	def run_ode_combine(self, gt_data, gt_time_steps, 
-		t0 = None, save_info = False):
+	def run_odernn(self, gt_data, gt_time_steps, 
+		run_backwards = True, save_info = False):
+
+
+		print("\nrun_backwards")
+		print(run_backwards)
+
 		# t0 -- time stamp of z0 which we are making the encoding for 
 		# t0 must be either before or after any point within gt_time_steps
 		n_traj, n_tp, n_dims = gt_data.size()
 		extra_info = []
 
-		t0, run_backwards = check_t0(t0, gt_time_steps)
+		t0 = gt_time_steps[-1]
+		if run_backwards:
+			t0 = gt_time_steps[0]
 
 		device = get_device(gt_data)
 
@@ -350,11 +357,16 @@ class Encoder_z0_ODE_RNN(nn.Module):
 			prev_y, prev_std = yi, yi_std			
 			prev_t, t_i = gt_time_steps[i],  gt_time_steps[i-1]
 
+			latent_ys.append(yi)
+
 			if save_info:
 				d = {"yi_ode": yi_ode.detach(), #"yi_from_data": yi_from_data,
 					 "yi": yi.detach(), "yi_std": yi_std.detach(), 
 					 "time_points": time_points.detach(), "ode_sol": ode_sol.detach()}
 				extra_info.append(d)
+
+		latent_ys = torch.stack(latent_ys, 1)
+		assert(not torch.isnan(latent_ys).any())
 
 		assert(not torch.isnan(yi).any())
 		assert(not torch.isnan(yi_std).any())

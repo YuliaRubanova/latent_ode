@@ -16,7 +16,6 @@ from person_activity import PersonActivity, variable_time_collate_fn_activity
 
 from sklearn import model_selection
 import random
-from sklearn.model_selection import KFold
 
 #####################################################################################################
 def parse_datasets(args, device):
@@ -198,7 +197,7 @@ def parse_datasets(args, device):
 		dataset_obj = Periodic_1d(
 			init_freq = None, init_amplitude = 1.,
 			final_amplitude = 1., final_freq = None, 
-			noise_generator = None, z0 = 1.)
+			z0 = 1.)
 
 	##################################################################
 

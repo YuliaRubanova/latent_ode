@@ -35,7 +35,7 @@ from mujoco_physics import HopperPhysics
 from lib.utils import compute_loss_all_batches
 
 # Generative model for noisy data based on ODE
-parser = argparse.ArgumentParser('ODEVAE')
+parser = argparse.ArgumentParser('Latent ODE')
 parser.add_argument('-n',  type=int, default=100)
 parser.add_argument('--niters', type=int, default=300)
 parser.add_argument('--lr',  type=float, default=1e-2, help="Starting learning rate.")
@@ -195,7 +195,6 @@ if __name__ == '__main__':
 			input_dim = input_dim, 
 			latent_dim = n_ode_gru_dims,
 			ode_func_net = ode_func_net,
-			save_ode_ts = False,
 			device = device).to(device)
 
 		z0_diffeq_solver = DiffeqSolver(input_dim, rec_ode_func, "euler", args.latents, 
@@ -251,7 +250,7 @@ if __name__ == '__main__':
 		train_res["loss"].backward()
 		optimizer.step()
 
-		n_iters_to_viz = max(1, args.niters // 10)
+		n_iters_to_viz = 10
 		if itr % (n_iters_to_viz * num_batches) == 0:
 			with torch.no_grad():
 
