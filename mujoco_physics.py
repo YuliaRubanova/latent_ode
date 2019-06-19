@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from lib.utils import get_dict_template
 import lib.utils as utils
+from torchvision.datasets.utils import download_url
 
 class HopperPhysics(object):
 
@@ -10,14 +11,13 @@ class HopperPhysics(object):
 	D = 14
 
 	n_training_samples = 10000
-	n_test_samples = 2000
 
 	training_file = 'training.pt'
-	test_file = 'test.pt'
 
-	def __init__(self, root, train=True, generate=False, device = torch.device("cpu")):
+	def __init__(self, root, download = True, generate=False, device = torch.device("cpu")):
 		self.root = root
-		self.train = train
+		if download:
+			self._download()
 
 		if generate:
 			self._generate_dataset()
@@ -25,12 +25,9 @@ class HopperPhysics(object):
 		if not self._check_exists():
 			raise RuntimeError('Dataset not found.' + ' You can use download=True to download it')
 
-		if self.train:
-			data_file = self.training_file
-		else:
-			data_file = self.test_file
-		self.data = torch.Tensor(torch.load(os.path.join(self.data_folder, data_file))).to(device)
-		
+		data_file = os.path.join(self.data_folder, self.training_file)
+
+		self.data = torch.Tensor(torch.load(data_file)).to(device)
 		self.data, self.data_min, self.data_max = utils.normalize_data(self.data)
 
 		self.device =device
@@ -74,12 +71,18 @@ class HopperPhysics(object):
 		if self._check_exists():
 			return
 		os.makedirs(self.data_folder, exist_ok=True)
-		print('Generating training dataset...')
+		print('Generating dataset...')
 		train_data = self._generate_random_trajectories(self.n_training_samples)
-		print('Generating test dataset...')
-		test_data = self._generate_random_trajectories(self.n_test_samples)
 		torch.save(train_data, os.path.join(self.data_folder, self.training_file))
-		torch.save(test_data, os.path.join(self.data_folder, self.test_file))
+
+	def _download(self):
+		if self._check_exists():
+			return
+
+		print("Downloading the dataset [325MB] ...")
+		os.makedirs(self.data_folder, exist_ok=True)
+		url = "http://www.cs.toronto.edu/~rtqichen/datasets/HopperPhysics/training.pt"
+		download_url(url, self.data_folder, "training.pt", None)
 
 	def _generate_random_trajectories(self, n_samples):
 
@@ -112,8 +115,7 @@ class HopperPhysics(object):
 		return data
 
 	def _check_exists(self):
-		return os.path.exists(os.path.join(self.data_folder, self.training_file)) and \
-			os.path.exists(os.path.join(self.data_folder, self.test_file))
+		return os.path.exists(os.path.join(self.data_folder, self.training_file))
 
 	@property
 	def data_folder(self):
@@ -136,7 +138,6 @@ class HopperPhysics(object):
 	def __repr__(self):
 		fmt_str = 'Dataset ' + self.__class__.__name__ + '\n'
 		fmt_str += '    Number of datapoints: {}\n'.format(self.__len__())
-		fmt_str += '    Split: {}\n'.format('train' if self.train is True else 'test')
 		fmt_str += '    Root Location: {}\n'.format(self.root)
 		return fmt_str
 
