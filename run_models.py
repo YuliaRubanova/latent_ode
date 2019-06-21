@@ -1,11 +1,7 @@
 import os
-import gc
 import sys
 import matplotlib
-if os.path.exists("/Users/yulia"):
-	matplotlib.use('TkAgg')
-else:
-	matplotlib.use('Agg')
+matplotlib.use('TkAgg')
 import matplotlib.pyplot
 import matplotlib.pyplot as plt
 
@@ -23,6 +19,7 @@ from torch.nn.functional import relu
 import torch.optim as optim
 
 import lib.utils as utils
+from lib.plotting import *
 
 from lib.rnn_baselines import *
 from lib.ode_rnn import *
@@ -36,10 +33,11 @@ from lib.utils import compute_loss_all_batches
 
 # Generative model for noisy data based on ODE
 parser = argparse.ArgumentParser('Latent ODE')
-parser.add_argument('-n',  type=int, default=100)
+parser.add_argument('-n',  type=int, default=100, help="Size of the dataset")
 parser.add_argument('--niters', type=int, default=300)
 parser.add_argument('--lr',  type=float, default=1e-2, help="Starting learning rate.")
 parser.add_argument('-b', '--batch-size', type=int, default=50)
+parser.add_argument('--viz', action='store_true', help="Show plots while training")
 
 parser.add_argument('--save', type=str, default='experiments/', help="Path for save checkpoints")
 parser.add_argument('--load', type=str, default=None, help="ID of the experiment to load for evaluation. If None, run a new experiment.")
@@ -62,7 +60,7 @@ parser.add_argument('--ode-rnn', action='store_true', help="Run ODE-RNN baseline
 
 parser.add_argument('--rnn-vae', action='store_true', help="Run RNN baseline: seq2seq model with sampling of the h0 and ELBO loss.")
 
-parser.add_argument('-l', '--latents', type=int, default=6)
+parser.add_argument('-l', '--latents', type=int, default=6, help="Size of the latent state")
 parser.add_argument('--rec-dims', type=int, default=20, help="Dimensionality of the recognition model (ODE or RNN).")
 
 parser.add_argument('--rec-layers', type=int, default=1, help="Number of layers in ODE func in recognition ODE")
@@ -216,6 +214,11 @@ if __name__ == '__main__':
 		raise Exception("Model not specified")
 
 	##################################################################
+
+	if args.viz:
+		viz = Visualizations(device)
+
+	##################################################################
 	
 	#Load checkpoint and evaluate the model
 	if args.load is not None:
@@ -296,6 +299,17 @@ if __name__ == '__main__':
 			}, ckpt_path)
 
 
+			# Plotting
+			if args.viz:
+				with torch.no_grad():
+					test_dict = utils.get_next_batch(data_obj["test_dataloader"])
+
+					print("plotting....")
+					if args.dataset != "physionet": #and not args.classic_rnn and not args.ode_rnn:
+						viz.draw_all_plots_one_dim(test_dict, model, 
+							plot_name = file_name + "_itr_" + str(itr // num_batches),
+						 	experimentID = experimentID)
+						plt.pause(0.01)
 	torch.save({
 		'args': args,
 		'state_dict': model.state_dict(),
