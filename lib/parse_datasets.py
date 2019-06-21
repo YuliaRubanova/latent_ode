@@ -19,6 +19,8 @@ import random
 
 #####################################################################################################
 def parse_datasets(args, device):
+	
+
 	def basic_collate_fn(batch, time_steps, args = args, device = device, data_type = "train"):
 		batch = torch.stack(batch)
 		data_dict = {
@@ -27,6 +29,7 @@ def parse_datasets(args, device):
 
 		data_dict = utils.split_and_subsample_batch(data_dict, args, data_type = data_type)
 		return data_dict
+
 
 	dataset_name = args.dataset
 
@@ -77,7 +80,7 @@ def parse_datasets(args, device):
 		batch_size = min(args.batch_size, args.n)
 		train_dataloader = DataLoader(train_y, batch_size = batch_size, shuffle=False,
 			collate_fn= lambda batch: basic_collate_fn(batch, time_steps, data_type = "train"))
-		test_dataloader = DataLoader(test_y, batch_size = batch_size, shuffle=False,
+		test_dataloader = DataLoader(test_y, batch_size = n_samples, shuffle=False,
 			collate_fn= lambda batch: basic_collate_fn(batch, time_steps, data_type = "test"))
 		
 		data_objects = {"dataset_obj": dataset_obj, 
@@ -123,12 +126,10 @@ def parse_datasets(args, device):
 		batch_size = min(min(len(train_dataset_obj), args.batch_size), args.n)
 		data_min, data_max = get_data_min_max(total_dataset)
 
-		train_dataloader = DataLoader(train_data, batch_size= batch_size, 
-			shuffle=False, 
+		train_dataloader = DataLoader(train_data, batch_size= batch_size, shuffle=False, 
 			collate_fn= lambda batch: variable_time_collate_fn(batch, args, device, data_type = "train",
 				data_min = data_min, data_max = data_max))
-		test_dataloader = DataLoader(test_data, batch_size = batch_size, 
-			shuffle=False, 
+		test_dataloader = DataLoader(test_data, batch_size = n_samples, shuffle=False, 
 			collate_fn= lambda batch: variable_time_collate_fn(batch, args, device, data_type = "test",
 				data_min = data_min, data_max = data_max))
 
@@ -148,8 +149,9 @@ def parse_datasets(args, device):
 	# Human activity dataset
 
 	if dataset_name == "activity":
+		n_samples =  min(10000, args.n)
 		dataset_obj = PersonActivity('data/PersonActivity', 
-							download=True, n_samples =  min(10000, args.n), device = device)
+							download=True, n_samples =  n_samples, device = device)
 		print(dataset_obj)
 		# Use custom collate_fn to combine samples with arbitrary time observations.
 		# Returns the dataset along with mask and time steps
@@ -167,7 +169,7 @@ def parse_datasets(args, device):
 		batch_size = min(min(len(dataset_obj), args.batch_size), args.n)
 		train_dataloader = DataLoader(train_data, batch_size= batch_size, shuffle=False, 
 			collate_fn= lambda batch: variable_time_collate_fn_activity(batch, args, device, data_type = "train"))
-		test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=False, 
+		test_dataloader = DataLoader(test_data, batch_size=n_samples, shuffle=False, 
 			collate_fn= lambda batch: variable_time_collate_fn_activity(batch, args, device, data_type = "test"))
 
 		data_objects = {"dataset_obj": dataset_obj, 
@@ -223,7 +225,7 @@ def parse_datasets(args, device):
 	batch_size = min(args.batch_size, args.n)
 	train_dataloader = DataLoader(train_y, batch_size = batch_size, shuffle=False,
 		collate_fn= lambda batch: basic_collate_fn(batch, time_steps_extrap, data_type = "train"))
-	test_dataloader = DataLoader(test_y, batch_size = batch_size, shuffle=False,
+	test_dataloader = DataLoader(test_y, batch_size = args.n, shuffle=False,
 		collate_fn= lambda batch: basic_collate_fn(batch, time_steps_extrap, data_type = "test"))
 	
 	data_objects = {"dataset_obj": dataset_obj, 

@@ -8,8 +8,7 @@ import lib.utils as utils
 from torch.distributions.multivariate_normal import MultivariateNormal
 
 # git clone https://github.com/rtqichen/torchdiffeq.git
-# Don't use adjoint method -- it is very slow
-from torchdiffeq.torchdiffeq import odeint as odeint
+from torchdiffeq import odeint as odeint
 
 #####################################################################################################
 

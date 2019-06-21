@@ -124,7 +124,7 @@ class PersonActivity(object):
 
 		for url in self.urls:
 			filename = url.rpartition('/')[2]
-			#download_url(url, self.raw_folder, filename, None)
+			download_url(url, self.raw_folder, filename, None)
 
 			print('Processing {}...'.format(filename))
 

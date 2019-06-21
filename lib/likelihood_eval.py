@@ -238,9 +238,7 @@ def compute_poisson_proc_likelihood(truth, pred_y, info, mask = None):
 	if mask is None:
 		poisson_log_l = torch.sum(info["log_lambda_y"], 2) - info["int_lambda"]
 		# Sum over data dims
-		poisson_log_l = torch.mean(poisson_log_l, -1) #!!!!!!!!!!!
-		# Take mean over n_traj
-		#poisson_log_l = torch.mean(poisson_log_l, 1)
+		poisson_log_l = torch.mean(poisson_log_l, -1)
 	else:
 		# Compute likelihood of the data under the predictions
 		truth_repeated = truth.repeat(pred_y.size(0), 1, 1, 1)
@@ -254,9 +252,6 @@ def compute_poisson_proc_likelihood(truth, pred_y, info, mask = None):
 		# Take mean over n_traj
 		#poisson_log_l = torch.mean(poisson_log_l, 1)
 		
-
-	#print("Reconstruction: {}".format(torch.mean(log_density)))
-	#print("Poisson: {}".format(torch.mean(poisson_log_l)))
 	# poisson_log_l shape: [n_traj_samples, n_traj]
 	return poisson_log_l
 

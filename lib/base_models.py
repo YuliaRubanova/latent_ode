@@ -305,17 +305,9 @@ class VAE_Baseline(nn.Module):
 					info["label_predictions"], 
 					batch_dict["labels"],
 					mask = batch_dict["mask_predicted_data"])
-			
-			if torch.isnan(ce_loss):
-				print("label pred")
-				print(info["label_predictions"])
-				print("labels")
-				print( batch_dict["labels"])
-				raise Exception("CE loss is Nan!")
-			#print("CE loss: {}".format(torch.mean(ce_loss)))
 
 		# IWAE loss
-		loss = - torch.logsumexp(rec_likelihood + kl_coef * kldiv_z0,0) # + kldiv_z
+		loss = - torch.logsumexp(rec_likelihood + kl_coef * kldiv_z0,0)
 		if torch.isnan(loss):
 			loss = - torch.mean(rec_likelihood + kl_coef * kldiv_z0,0)
 			

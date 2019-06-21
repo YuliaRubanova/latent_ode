@@ -42,9 +42,6 @@ def get_logger(logpath, filepath, package_files=[],
 		console_handler.setLevel(level)
 		logger.addHandler(console_handler)
 	logger.info(filepath)
-	# Add the code of the file to the log
-	# with open(filepath, 'r') as f:
-	# 	logger.info(f.read())
 
 	for f in package_files:
 		logger.info(f)

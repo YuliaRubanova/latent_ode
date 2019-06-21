@@ -136,8 +136,6 @@ class Encoder_z0_RNN(nn.Module):
 			# Look at data in the reverse order: from later points to the first
 			data = utils.reverse(data)
 
-		assert(not torch.isnan(data).any())
-
 		if self.use_delta_t:
 			delta_t = gt_time_steps[1:] - gt_time_steps[:-1]
 			if run_backwards:
@@ -148,10 +146,7 @@ class Encoder_z0_RNN(nn.Module):
 			delta_t = delta_t.unsqueeze(1).repeat((1,n_traj)).unsqueeze(-1)
 			data = torch.cat((delta_t, data),-1)
 
-		assert(not torch.isnan(data).any())
-
 		outputs, _ = self.gru_rnn(data)
-		assert(not torch.isnan(outputs).any())
 
 		# LSTM output shape: (seq_len, batch, num_directions * hidden_size)
 		last_output = outputs[-1]
@@ -212,6 +207,9 @@ class Encoder_z0_ODE_RNN(nn.Module):
 		# t0 -- time stamp of z0 which we are making the encoding for
 		# t0 must be either before or after any point within gt_time_steps
 
+		assert(not torch.isnan(gt_data).any())
+		assert(not torch.isnan(gt_time_steps).any())
+
 		n_traj, n_tp, n_dims = gt_data.size()
 		if len(gt_time_steps) == 1:
 			prev_y = torch.zeros((1, n_traj, self.latent_dim)).to(self.device)
@@ -235,18 +233,11 @@ class Encoder_z0_ODE_RNN(nn.Module):
 		if save_info:
 			self.extra_info = extra_info
 
-			print("save_info")
-			print(extra_info)
-
 		return mean_z0, std_z0
 
 
 	def run_odernn(self, gt_data, gt_time_steps, 
 		run_backwards = True, save_info = False):
-
-
-		print("\nrun_backwards")
-		print(run_backwards)
 
 		# t0 -- time stamp of z0 which we are making the encoding for 
 		# t0 must be either before or after any point within gt_time_steps
@@ -279,28 +270,10 @@ class Encoder_z0_ODE_RNN(nn.Module):
 			time_points_iter = reversed(time_points_iter)
 
 		for i in time_points_iter:
-			#print("time point " + str(gt_time_steps[i]))
-			
 			if (prev_t - t_i) < minimum_step:
 				time_points = torch.stack((prev_t, t_i))
 				inc = self.z0_diffeq_solver.ode_func(prev_t, prev_y) * (t_i - prev_t)
 
-				if torch.isnan(inc).any():
-					print("inc is None!!")
-					print(i)
-					print(self.z0_diffeq_solver.ode_func(prev_t, prev_y))
-					print(torch.isnan(prev_y).any())
-				
-				assert(not torch.isnan(t_i - prev_t).any())
-				assert(not torch.isnan(prev_t).any())
-				assert(not torch.isnan(prev_y).any())
-				if torch.isnan(inc).any():
-					print("inc is nan!")
-					print(t_i)
-					print(prev_t)
-					print(t_i - prev_t)
-					print(prev_y)
-					exit()
 				assert(not torch.isnan(inc).any())
 
 				ode_sol = prev_y + inc
@@ -308,17 +281,9 @@ class Encoder_z0_ODE_RNN(nn.Module):
 
 				assert(not torch.isnan(ode_sol).any())
 			else:
-				#print("running ODE solver in encoder: {}".format((prev_t - t_i)))
 				n_intermediate_tp = max(2, ((prev_t - t_i) / minimum_step).int())
 
 				time_points = utils.linspace_vector(prev_t, t_i, n_intermediate_tp)
-				
-				#print("solving ode. N steps: {}".format(n_intermediate_tp))
-
-				assert(not torch.isnan(time_points).any())
-				assert(not torch.isnan(prev_y).any())
-
-				#time_points = torch.stack((prev_t, t_i))
 				ode_sol = self.z0_diffeq_solver(prev_y, time_points)
 
 				assert(not torch.isnan(ode_sol).any())
@@ -332,14 +297,7 @@ class Encoder_z0_ODE_RNN(nn.Module):
 			yi_ode = ode_sol[:, :, -1, :]
 			xi = gt_data[:,i,:].unsqueeze(0)
 			
-			assert(not torch.isnan(xi).any())
-			assert(not torch.isnan(yi_ode).any())
-			assert(not torch.isnan(prev_std).any())
-
 			yi, yi_std = self.GRU_update(yi_ode, prev_std, xi)
-
-			assert(not torch.isnan(yi).any())
-			assert(not torch.isnan(yi_std).any())
 
 			prev_y, prev_std = yi, yi_std			
 			prev_t, t_i = gt_time_steps[i],  gt_time_steps[i-1]
@@ -353,7 +311,6 @@ class Encoder_z0_ODE_RNN(nn.Module):
 				extra_info.append(d)
 
 		latent_ys = torch.stack(latent_ys, 1)
-		assert(not torch.isnan(latent_ys).any())
 
 		assert(not torch.isnan(yi).any())
 		assert(not torch.isnan(yi_std).any())

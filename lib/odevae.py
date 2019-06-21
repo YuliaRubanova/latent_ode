@@ -74,21 +74,10 @@ class ODEVAE(VAE_Baseline):
 		else:
 			first_point_enc_aug = first_point_enc
 			means_z0_aug = means_z0
-
-		if torch.isnan(first_point_enc).any():
-			print("first_point_enc has Nans!")
-			print(time_steps_to_predict)
-			print(truth_time_steps)
-			print(torch.isnan(truth).any())
-			if mask is not None:
-				print(torch.isnan(mask).any())
-			else:
-				print("mask is None")
 			
 		assert(not torch.isnan(time_steps_to_predict).any())
 		assert(not torch.isnan(first_point_enc).any())
 		assert(not torch.isnan(first_point_enc_aug).any())
-
 
 		# Shape of sol_y [n_traj_samples, n_samples, n_timepoints, n_latents]
 		sol_y = self.diffeq_solver(first_point_enc_aug, time_steps_to_predict)
