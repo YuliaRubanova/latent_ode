@@ -21,9 +21,7 @@ class ODE_RNN(Baseline):
 	def __init__(self, input_dim, latent_dim, device = torch.device("cpu"),
 		z0_diffeq_solver = None, n_gru_units = 100,  n_units = 100,
 		concat_mask = False, obsrv_std = 0.1, use_binary_classif = False,
-		classif_per_tp = False,
-		n_labels = 1,
-		train_classif_w_reconstr = False):
+		classif_per_tp = False, n_labels = 1, train_classif_w_reconstr = False):
 
 		Baseline.__init__(self, input_dim, latent_dim, device = device, 
 			obsrv_std = obsrv_std, use_binary_classif = use_binary_classif,
@@ -31,10 +29,10 @@ class ODE_RNN(Baseline):
 			n_labels = n_labels,
 			train_classif_w_reconstr = train_classif_w_reconstr)
 
-		ode_combine_dim = latent_dim
+		ode_rnn_encoder_dim = latent_dim
 	
 		self.ode_gru = Encoder_z0_ODE_RNN( 
-			latent_dim = ode_combine_dim, 
+			latent_dim = ode_rnn_encoder_dim, 
 			input_dim = (input_dim) * 2, # input and the mask
 			z0_diffeq_solver = z0_diffeq_solver, 
 			n_gru_units = n_gru_units, 
@@ -64,10 +62,9 @@ class ODE_RNN(Baseline):
 		if mask is not None:
 			data_and_mask = torch.cat([data, mask],-1)
 
-		_, _, latent_ys, _ = self.ode_gru.run_ode_combine(
-			data_and_mask, truth_time_steps,
-			t0 = time_steps_to_predict[-1],
-			save_latents = True, save_info = False)
+		_, _, latent_ys, _ = self.ode_gru.run_odernn(
+			data_and_mask, truth_time_steps, run_backwards = False)
+		
 		latent_ys = latent_ys.permute(0,2,1,3)
 		last_hidden = latent_ys[:,:,-1,:]
 

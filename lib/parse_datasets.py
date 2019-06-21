@@ -36,7 +36,7 @@ def parse_datasets(args, device):
 	##################################################################
 	# MuJoCo dataset
 	if dataset_name == "hopper":
-		dataset_obj = HopperPhysics(root='data', train=True, generate=False, device = device)
+		dataset_obj = HopperPhysics(root='data', download=True, generate=False, device = device)
 		dataset = dataset_obj.get_dataset()[:args.n]
 		dataset = dataset.to(device)
 

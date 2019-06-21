@@ -78,8 +78,8 @@ parser.add_argument('--linear-classif', action='store_true', help="If using a cl
 parser.add_argument('--extrap', action='store_true', help="Set extrapolation mode. If this flag is not set, run interpolation mode.")
 
 parser.add_argument('-t', '--timepoints', type=int, default=100, help="Total number of time-points")
-parser.add_argument('--max-t',  type=float, default=1., help="We subsample points in the interval [0, args.max_tp]")
-parser.add_argument('--noise-weight', type=float, default=0.1, help="Noise amplitude for generated traejctories")
+parser.add_argument('--max-t',  type=float, default=5., help="We subsample points in the interval [0, args.max_tp]")
+parser.add_argument('--noise-weight', type=float, default=0.01, help="Noise amplitude for generated traejctories")
 
 
 args = parser.parse_args()

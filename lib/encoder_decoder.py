@@ -120,15 +120,6 @@ class Encoder_z0_RNN(nn.Module):
 		# shape required for rnn: (seq_len, batch, input_size)
 		# t0: not used here
 		n_traj = gt_data.size(0)
-		
-
-
-
-		print("\nrun_backwards")
-		print(run_backwards)
-
-
-
 
 		assert(not torch.isnan(gt_data).any())
 		assert(not torch.isnan(gt_time_steps).any())
@@ -220,10 +211,6 @@ class Encoder_z0_ODE_RNN(nn.Module):
 		# gt_data, gt_time_steps -- observations and their time stamps
 		# t0 -- time stamp of z0 which we are making the encoding for
 		# t0 must be either before or after any point within gt_time_steps
-	
-		print("\nrun_backwards")
-		print(run_backwards)
-
 
 		n_traj, n_tp, n_dims = gt_data.size()
 		if len(gt_time_steps) == 1:

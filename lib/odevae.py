@@ -44,19 +44,16 @@ class ODEVAE(VAE_Baseline):
 		self.use_poisson_proc = use_poisson_proc
 
 	def get_reconstruction(self, time_steps_to_predict, truth, truth_time_steps, 
-		mask = None, n_traj_samples = 1, t0 = None, mode = None):
+		mask = None, n_traj_samples = 1, run_backwards = True, mode = None):
 
 		if isinstance(self.encoder_z0, Encoder_z0_ODE_RNN) or \
 			isinstance(self.encoder_z0, Encoder_z0_RNN):
 
-			# set t0 -- the time point when we want to get the latent state y using encoder_z0
-			if (t0 is None) or (t0 == time_steps_to_predict[0]):
-				t0 = time_steps_to_predict[0]
-
 			truth_w_mask = truth
 			if mask is not None:
 				truth_w_mask = torch.cat((truth, mask), -1)
-			first_point_mu, first_point_std = self.encoder_z0(truth_w_mask, truth_time_steps, t0=t0)
+			first_point_mu, first_point_std = self.encoder_z0(
+				truth_w_mask, truth_time_steps, run_backwards = run_backwards)
 
 			means_z0 = first_point_mu.repeat(n_traj_samples, 1, 1)
 			sigma_z0 = first_point_std.repeat(n_traj_samples, 1, 1)
