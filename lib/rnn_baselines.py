@@ -73,7 +73,6 @@ class GRUCellExpDecay(RNNCellBase):
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Imputation with a weighed average of previous value and empirical mean 
 # adapted from GRU-D implementation: https://github.com/zhiyongc/GRU-D/
-
 def get_cum_delta_ts(data, delta_ts, mask):
 	n_traj, n_tp, n_dims = data.size()
 	
@@ -92,6 +91,8 @@ def get_cum_delta_ts(data, delta_ts, mask):
 	return cum_delta_ts
 
 
+# adapted from GRU-D implementation: https://github.com/zhiyongc/GRU-D/
+# very slow
 def impute_using_input_decay(data, delta_ts, mask, w_input_decay, b_input_decay):
 	n_traj, n_tp, n_dims = data.size()
 

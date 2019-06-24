@@ -18,7 +18,7 @@ from lib.base_models import VAE_Baseline
 
 
 
-class ODEVAE(VAE_Baseline):
+class LatentODE(VAE_Baseline):
 	def __init__(self, input_dim, latent_dim, encoder_z0, decoder, diffeq_solver, 
 		z0_prior, device, obsrv_std = None, 
 		use_binary_classif = False, use_poisson_proc = False,
@@ -27,7 +27,7 @@ class ODEVAE(VAE_Baseline):
 		n_labels = 1,
 		train_classif_w_reconstr = False):
 
-		super(ODEVAE, self).__init__(
+		super(LatentODE, self).__init__(
 			input_dim = input_dim, latent_dim = latent_dim, 
 			z0_prior = z0_prior, 
 			device = device, obsrv_std = obsrv_std, 

@@ -20,7 +20,7 @@ from lib.rnn_baselines import *
 from lib.ode_rnn import *
 import torch.nn.functional as functional
 from torch.distributions.normal import Normal
-from lib.odevae import ODEVAE
+from lib.latent_ode import LatentODE
 
 from lib.likelihood_eval import masked_gaussian_log_density
 try:
@@ -308,7 +308,7 @@ class Visualizations():
 		device = get_device(time_steps)
 
 		time_steps_to_predict = time_steps
-		if isinstance(model, ODEVAE):
+		if isinstance(model, LatentODE):
 			# sample at the original time points
 			time_steps_to_predict = utils.linspace_vector(time_steps[0], time_steps[-1], 100).to(device)
 
@@ -373,7 +373,7 @@ class Visualizations():
 		############################################
 		# Plot trajectories from prior
 		
-		if isinstance(model, ODEVAE):
+		if isinstance(model, LatentODE):
 			traj_from_prior = model.sample_traj_from_prior(time_steps_to_predict, n_traj_samples = 3)
 			# Since in this case n_traj = 1, n_traj_samples -- requested number of samples from the prior, squeeze n_traj dimension
 			traj_from_prior = traj_from_prior.squeeze(1)

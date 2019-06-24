@@ -23,7 +23,7 @@ from lib.plotting import *
 
 from lib.rnn_baselines import *
 from lib.ode_rnn import *
-from lib.create_odevae_model import create_ODEVAE_model
+from lib.create_latent_ode_model import create_LatentODE_model
 from lib.parse_datasets import parse_datasets
 from lib.ode_func import ODEFunc, ODEFunc_w_Poisson
 from lib.diffeq_solver import DiffeqSolver
@@ -207,7 +207,7 @@ if __name__ == '__main__':
 			train_classif_w_reconstr = (args.dataset == "physionet")
 			).to(device)
 	elif args.latent_ode:
-		model = create_ODEVAE_model(args, input_dim, z0_prior, obsrv_std, device, 
+		model = create_LatentODE_model(args, input_dim, z0_prior, obsrv_std, device, 
 			classif_per_tp = classif_per_tp,
 			n_labels = n_labels)
 	else:
@@ -305,7 +305,7 @@ if __name__ == '__main__':
 					test_dict = utils.get_next_batch(data_obj["test_dataloader"])
 
 					print("plotting....")
-					if isinstance(model, ODEVAE) and (args.dataset != "physionet"): #and not args.classic_rnn and not args.ode_rnn:
+					if isinstance(model, LatentODE) and (args.dataset != "physionet"): #and not args.classic_rnn and not args.ode_rnn:
 						plot_id = itr // num_batches // n_iters_to_viz
 						viz.draw_all_plots_one_dim(test_dict, model, 
 							plot_name = file_name + "_" + str(experimentID) + "_{:03d}".format(plot_id) + ".png",

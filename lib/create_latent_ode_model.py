@@ -6,7 +6,7 @@ import torch.nn as nn
 from torch.nn.functional import relu
 
 import lib.utils as utils
-from lib.odevae import ODEVAE
+from lib.latent_ode import LatentODE
 from lib.encoder_decoder import *
 from lib.diffeq_solver import DiffeqSolver
 
@@ -15,7 +15,7 @@ from lib.ode_func import ODEFunc, ODEFunc_w_Poisson
 
 #####################################################################################################
 
-def create_ODEVAE_model(args, input_dim, z0_prior, obsrv_std, device, 
+def create_LatentODE_model(args, input_dim, z0_prior, obsrv_std, device, 
 	classif_per_tp = False, n_labels = 1):
 
 	dim = args.latents
@@ -80,7 +80,7 @@ def create_ODEVAE_model(args, input_dim, z0_prior, obsrv_std, device,
 	diffeq_solver = DiffeqSolver(gen_data_dim, gen_ode_func, 'dopri5', args.latents, 
 		odeint_rtol = 1e-3, odeint_atol = 1e-4, device = device)
 
-	model = ODEVAE(
+	model = LatentODE(
 		input_dim = gen_data_dim, 
 		latent_dim = args.latents, 
 		encoder_z0 = encoder_z0, 
