@@ -82,7 +82,3 @@ GRU-D consists of two parts: input imputation (--input-decay) and exponential de
 ```
 python3 run_models.py --niters 500 -n 100  -b 30 -l 10 --dataset periodic  --classic-rnn --input-decay --rnn-cell expdecay
 ```
-
-
-
-
