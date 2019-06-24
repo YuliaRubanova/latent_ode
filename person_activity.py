@@ -1,11 +1,4 @@
 import os
-import matplotlib
-if os.path.exists("/Users/yulia"):
-	matplotlib.use('TkAgg')
-else:
-	matplotlib.use('Agg')
-import matplotlib.pyplot
-import matplotlib.pyplot as plt
 
 import lib.utils as utils
 import numpy as np

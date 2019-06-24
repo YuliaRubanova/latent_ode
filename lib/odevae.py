@@ -90,7 +90,10 @@ class ODEVAE(VAE_Baseline):
 
 		pred_x = self.decoder(sol_y)
 
-		all_extra_info = {"first_point": (first_point_mu, first_point_std, first_point_enc)}
+		all_extra_info = {
+			"first_point": (first_point_mu, first_point_std, first_point_enc),
+			"latent_traj": sol_y.detach()
+		}
 
 		if self.use_poisson_proc:
 			# intergral of lambda from the last step of ODE Solver
@@ -106,7 +109,7 @@ class ODEVAE(VAE_Baseline):
 		return pred_x, all_extra_info
 
 
-	def sample_traj_from_prior(self, time_steps_to_predict, n_traj_samples = 1, mixtures = None):
+	def sample_traj_from_prior(self, time_steps_to_predict, n_traj_samples = 1):
 		# input_dim = starting_point.size()[-1]
 		# starting_point = starting_point.view(1,1,input_dim)
 

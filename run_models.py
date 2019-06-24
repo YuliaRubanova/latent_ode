@@ -1,7 +1,7 @@
 import os
 import sys
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('Agg')
 import matplotlib.pyplot
 import matplotlib.pyplot as plt
 
@@ -242,18 +242,18 @@ if __name__ == '__main__':
 		optimizer.zero_grad()
 		utils.update_learning_rate(optimizer, decay_rate = 0.999, lowest = args.lr / 10)
 
-		wait_until_kl_inc = 50
+		wait_until_kl_inc = 10
 		if itr // num_batches < wait_until_kl_inc:
 			kl_coef = 0.
 		else:
-			kl_coef = (1-0.993** (itr // num_batches - wait_until_kl_inc))
+			kl_coef = (1-0.97** (itr // num_batches - wait_until_kl_inc))
 
 		batch_dict = utils.get_next_batch(data_obj["train_dataloader"])
 		train_res = model.compute_all_losses(batch_dict, n_traj_samples = 3, kl_coef = kl_coef)
 		train_res["loss"].backward()
 		optimizer.step()
 
-		n_iters_to_viz = 10
+		n_iters_to_viz = 1
 		if itr % (n_iters_to_viz * num_batches) == 0:
 			with torch.no_grad():
 
@@ -305,10 +305,11 @@ if __name__ == '__main__':
 					test_dict = utils.get_next_batch(data_obj["test_dataloader"])
 
 					print("plotting....")
-					if args.dataset != "physionet": #and not args.classic_rnn and not args.ode_rnn:
+					if isinstance(model, ODEVAE) and (args.dataset != "physionet"): #and not args.classic_rnn and not args.ode_rnn:
+						plot_id = itr // num_batches // n_iters_to_viz
 						viz.draw_all_plots_one_dim(test_dict, model, 
-							plot_name = file_name + "_itr_" + str(itr // num_batches),
-						 	experimentID = experimentID)
+							plot_name = file_name + "_" + str(experimentID) + "_{:03d}".format(plot_id) + ".png",
+						 	experimentID = experimentID, save=True)
 						plt.pause(0.01)
 	torch.save({
 		'args': args,
