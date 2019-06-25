@@ -3,6 +3,9 @@
 Code for the paper
 > Yulia Rubanova, Ricky Chen, David Duvenaud. "Latent ODEs for Irregularly-Sampled Time Series" (2019)
 
+<p align="center">
+<img align="middle" src="./assets/viz.gif" width="800" height="400" />
+</p>
 
 ## Prerequisites
 
