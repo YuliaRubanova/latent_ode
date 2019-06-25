@@ -104,13 +104,18 @@ def plot_vector_field(ax, odefunc, latent_dim, device):
 	dydt = -dydt.cpu().detach().numpy()
 	if latent_dim > 2:
 		dydt = dydt[:,:2]
+
+	mag = np.sqrt(dydt[:, 0]**2 + dydt[:, 1]**2).reshape(-1, 1)
+	dydt = (dydt / mag)
 	dydt = dydt.reshape(K, K, 2)
 
-	logmag = 2 * np.log(np.hypot(dydt[:, :, 0], dydt[:, :, 1]))
-	ax.quiver(
-		x, y, dydt[:, :, 0], dydt[:, :, 1],
-		np.exp(logmag), cmap="coolwarm", pivot="mid", scale = 100, #width=0.01, #, scale=20., width=0.015,
-	)
+	ax.streamplot(x, y, dydt[:, :, 0], dydt[:, :, 1], color = dydt[:, :, 0],
+		cmap="coolwarm", linewidth=2)
+
+	# ax.quiver(
+	# 	x, y, dydt[:, :, 0], dydt[:, :, 1],
+	# 	np.exp(logmag), cmap="coolwarm", pivot="mid", scale = 100,
+	# )
 	ax.set_xlim(-4, 4)
 	ax.set_ylim(-4, 4)
 	#ax.axis("off")
@@ -148,7 +153,7 @@ class Visualizations():
 		self.device = device
 
 	def init_visualization(self):
-		self.fig = plt.figure(figsize=(12, 6), facecolor='white')
+		self.fig = plt.figure(figsize=(12, 7), facecolor='white')
 		
 		self.ax_traj = []
 		for i in range(1,4):
@@ -374,12 +379,16 @@ class Visualizations():
 		# Plot trajectories from prior
 		
 		if isinstance(model, LatentODE):
+			torch.manual_seed(1991)
+			np.random.seed(1991)
+
 			traj_from_prior = model.sample_traj_from_prior(time_steps_to_predict, n_traj_samples = 3)
 			# Since in this case n_traj = 1, n_traj_samples -- requested number of samples from the prior, squeeze n_traj dimension
 			traj_from_prior = traj_from_prior.squeeze(1)
 
 			plot_trajectories(self.ax_traj_from_prior, traj_from_prior, time_steps_to_predict, 
-				title="Samples from prior (data space)", marker = '', linewidth = 3)
+				marker = '', linewidth = 3)
+			self.ax_traj_from_prior.set_title("Samples from prior (data space)", pad = 20)
 			self.set_plot_lims(self.ax_traj_from_prior, "traj_from_prior")
 		################################################
 
@@ -399,7 +408,7 @@ class Visualizations():
 		# Show vector field
 		self.ax_vector_field.cla()
 		plot_vector_field(self.ax_vector_field, model.diffeq_solver.ode_func, model.latent_dim, device)
-		self.ax_vector_field.set_title("Vector field (latent space)")
+		self.ax_vector_field.set_title("Slice of vector field (latent space)", pad = 20)
 		self.set_plot_lims(self.ax_vector_field, "vector_field")
 
 		################################################
@@ -424,6 +433,7 @@ class Visualizations():
 			custom_labels['dim ' + str(i)] = Line2D([0], [0], color=col)
 		
 		self.ax_latent_traj.set_ylabel("z")
+		self.ax_latent_traj.set_title("Latent trajectories z(t) (latent space)", pad = 20)
 		self.ax_latent_traj.legend(custom_labels.values(), custom_labels.keys(), loc = 'lower left')
 		self.set_plot_lims(self.ax_latent_traj, "latent_traj")
 
