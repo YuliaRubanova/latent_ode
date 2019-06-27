@@ -1,3 +1,8 @@
+###########################
+# Latent ODEs for Irregularly-Sampled Time Series
+# Author: Yulia Rubanova
+###########################
+
 # Create a synthetic dataset
 from __future__ import absolute_import, division
 from __future__ import print_function
@@ -113,6 +118,7 @@ class Periodic_1d(TimeSeries):
 				init_amplitude = init_amplitude, starting_point = noisy_z0, 
 				final_amplitude = final_amplitude, final_freq = final_freq)
 			traj_list.append(traj)
+
 		# shape: [n_samples, n_timesteps, 2]
 		# traj_list[:,:,0] -- time stamps
 		# traj_list[:,:,1] -- values at the time stamps

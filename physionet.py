@@ -1,3 +1,8 @@
+###########################
+# Latent ODEs for Irregularly-Sampled Time Series
+# Authors: Yulia Rubanova and Ricky Chen
+###########################
+
 import os
 import matplotlib
 if os.path.exists("/Users/yulia"):

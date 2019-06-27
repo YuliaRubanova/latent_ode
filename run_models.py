@@ -1,3 +1,8 @@
+###########################
+# Latent ODEs for Irregularly-Sampled Time Series
+# Author: Yulia Rubanova
+###########################
+
 import os
 import sys
 import matplotlib
@@ -44,8 +49,12 @@ parser.add_argument('--load', type=str, default=None, help="ID of the experiment
 parser.add_argument('-r', '--random-seed', type=int, default=1991, help="Random_seed")
 
 parser.add_argument('--dataset', type=str, default='periodic', help="Dataset to load. Available: physionet, activity, hopper, periodic")
-parser.add_argument('-s', '--sample-tp', type=float, default=None, help="How many points to sub-sample."
-	"If the number is in [0,1], take a percentage of available points per time series. If None, do not subsample")
+parser.add_argument('-s', '--sample-tp', type=float, default=None, help="Number of time points to sub-sample."
+	"If > 1, subsample exact number of points. If the number is in [0,1], take a percentage of available points per time series. If None, do not subsample")
+
+parser.add_argument('-c', '--cut-tp', type=int, default=None, help="Cut out the section of the timeline of the specified length (in number of points)."
+	"Used for periodic function demo.")
+
 parser.add_argument('--quantization', type=float, default=0.1, help="Quantization on the physionet dataset."
 	"Value 1 means quantization by 1 hour, value 0.1 means quantization by 0.1 hour = 6 min")
 
@@ -305,7 +314,7 @@ if __name__ == '__main__':
 					test_dict = utils.get_next_batch(data_obj["test_dataloader"])
 
 					print("plotting....")
-					if isinstance(model, LatentODE) and (args.dataset != "physionet"): #and not args.classic_rnn and not args.ode_rnn:
+					if isinstance(model, LatentODE) and (args.dataset == "periodic"): #and not args.classic_rnn and not args.ode_rnn:
 						plot_id = itr // num_batches // n_iters_to_viz
 						viz.draw_all_plots_one_dim(test_dict, model, 
 							plot_name = file_name + "_" + str(experimentID) + "_{:03d}".format(plot_id) + ".png",

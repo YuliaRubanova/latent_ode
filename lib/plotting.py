@@ -1,3 +1,8 @@
+###########################
+# Latent ODEs for Irregularly-Sampled Time Series
+# Author: Yulia Rubanova
+###########################
+
 import matplotlib
 # matplotlib.use('TkAgg')
 matplotlib.use('Agg')
@@ -320,10 +325,11 @@ class Visualizations():
 		reconstructions, info = model.get_reconstruction(time_steps_to_predict, 
 			observed_data, observed_time_steps, mask = observed_mask, n_traj_samples = 10)
 
-		n_traj_to_show = 5
+		n_traj_to_show = 3
 		# plot only 10 trajectories
-		data_for_plotting = data[:n_traj_to_show]
-		reconstructions_for_plotting = reconstructions[0,:n_traj_to_show]
+		data_for_plotting = observed_data[:n_traj_to_show]
+		mask_for_plotting = observed_mask[:n_traj_to_show]
+		reconstructions_for_plotting = reconstructions.mean(dim=0)[:n_traj_to_show]
 		reconstr_std = reconstructions.std(dim=0)[:n_traj_to_show]
 
 		dim_to_show = 0
@@ -341,7 +347,8 @@ class Visualizations():
 		for traj_id in range(3):
 			# Plot observations
 			plot_trajectories(self.ax_traj[traj_id], 
-				data_for_plotting[traj_id].unsqueeze(0), time_steps, 
+				data_for_plotting[traj_id].unsqueeze(0), observed_time_steps, 
+				mask = mask_for_plotting[traj_id].unsqueeze(0),
 				min_y = min_y, max_y = max_y, #title="True trajectories", 
 				marker = 'o', linestyle='', dim_to_show = dim_to_show,
 				color = cmap(2))
