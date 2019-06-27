@@ -1,10 +1,10 @@
 # Latent ODEs for Irregularly-Sampled Time Series
 
-Code for the paper
+Code for the paper:
 > Yulia Rubanova, Ricky Chen, David Duvenaud. "Latent ODEs for Irregularly-Sampled Time Series" (2019)
 
 <p align="center">
-<img align="middle" src="./assets/viz.gif" width="800" height="400" />
+<img align="middle" src="./assets/viz.gif" width="800" />
 </p>
 
 ## Prerequisites
@@ -20,7 +20,7 @@ Raw datasets:
 [[Physionet]](https://physionet.org/physiobank/database/challenge/2012/)
 [[Human Activity]](https://archive.ics.uci.edu/ml/datasets/Localization+Data+for+Person+Activity/)
 
-To generate trajectories from scratch, [DeepMind Control Suite](https://github.com/deepmind/dm_control/) is required
+To generate MuJoCo trajectories from scratch, [DeepMind Control Suite](https://github.com/deepmind/dm_control/) is required
 
 
 * Toy dataset of 1d periodic functions
