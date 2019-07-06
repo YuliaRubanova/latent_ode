@@ -104,6 +104,7 @@ def plot_vector_field(ax, odefunc, latent_dim, device):
 	K = int(K.imag)
 	zs = torch.from_numpy(np.stack([x, y], -1).reshape(K * K, 2)).to(device, torch.float32)
 	if latent_dim > 2:
+		# Plots dimensions 0 and 2
 		zs = torch.cat((zs, torch.zeros(K * K, latent_dim-2)), 1)
 	dydt = odefunc(0, zs)
 	dydt = -dydt.cpu().detach().numpy()
@@ -114,7 +115,7 @@ def plot_vector_field(ax, odefunc, latent_dim, device):
 	dydt = (dydt / mag)
 	dydt = dydt.reshape(K, K, 2)
 
-	ax.streamplot(x, y, dydt[:, :, 0], dydt[:, :, 1], color = dydt[:, :, 0],
+	ax.streamplot(x, y, dydt[:, :, 0], dydt[:, :, 1], #color = dydt[:, :, 0],
 		cmap="coolwarm", linewidth=2)
 
 	# ax.quiver(
@@ -396,7 +397,7 @@ class Visualizations():
 			plot_trajectories(self.ax_traj_from_prior, traj_from_prior, time_steps_to_predict, 
 				marker = '', linewidth = 3)
 			self.ax_traj_from_prior.set_title("Samples from prior (data space)", pad = 20)
-			self.set_plot_lims(self.ax_traj_from_prior, "traj_from_prior")
+			#self.set_plot_lims(self.ax_traj_from_prior, "traj_from_prior")
 		################################################
 
 		# Plot z0
@@ -417,6 +418,7 @@ class Visualizations():
 		plot_vector_field(self.ax_vector_field, model.diffeq_solver.ode_func, model.latent_dim, device)
 		self.ax_vector_field.set_title("Slice of vector field (latent space)", pad = 20)
 		self.set_plot_lims(self.ax_vector_field, "vector_field")
+		#self.ax_vector_field.set_ylim((-0.5, 1.5))
 
 		################################################
 		# Plot trajectories in the latent space

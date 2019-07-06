@@ -214,10 +214,6 @@ def parse_datasets(args, device):
 	dataset = dataset_obj.sample_traj(time_steps_extrap, n_samples = args.n, 
 		noise_weight = args.noise_weight)
 
-	# cut the time dimension [:,:,0]
-	# shape: [n_samples, n_tp, n_dim]
-	dataset = dataset[:,:,1:]
-
 	# Process small datasets
 	dataset = dataset.to(device)
 	time_steps_extrap = time_steps_extrap.to(device)

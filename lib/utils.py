@@ -165,7 +165,7 @@ def cut_out_timepoints(data, time_steps, mask, n_points_to_cut = None):
 	n_points_to_cut = int(n_points_to_cut)
 
 	for i in range(data.size(0)):
-		start = np.random.choice(np.arange(5, n_tp_in_batch - n_points_to_cut - 5), replace = False)
+		start = np.random.choice(np.arange(5, n_tp_in_batch - n_points_to_cut-5), replace = False)
 
 		data[i, start : (start + n_points_to_cut)] = 0.
 		if mask is not None:
@@ -467,6 +467,14 @@ def subsample_observed_data(data_dict, n_tp_to_sample = None, n_points_to_cut = 
 	new_data_dict["observed_data"] = data.clone()
 	new_data_dict["observed_tp"] = time_steps.clone()
 	new_data_dict["observed_mask"] = mask.clone()
+
+	if n_points_to_cut is not None:
+		# Cut the section in the data to predict as well
+		# Used only for the demo on the periodic function
+		new_data_dict["data_to_predict"] = data.clone()
+		new_data_dict["tp_to_predict"] = time_steps.clone()
+		new_data_dict["mask_predicted_data"] = mask.clone()
+
 	return new_data_dict
 
 
@@ -493,6 +501,10 @@ def split_and_subsample_batch(data_dict, args, data_type = "train"):
 		processed_dict = subsample_observed_data(processed_dict, 
 			n_tp_to_sample = args.sample_tp, 
 			n_points_to_cut = args.cut_tp)
+
+	# if (args.sample_tp is not None):
+	# 	processed_dict = subsample_observed_data(processed_dict, 
+	# 		n_tp_to_sample = args.sample_tp)
 	return processed_dict
 
 

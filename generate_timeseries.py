@@ -20,6 +20,7 @@ import pickle
 import matplotlib.pyplot as plt
 import matplotlib.image
 import torch
+import lib.utils as utils
 
 # ======================================================================================
 
@@ -80,13 +81,14 @@ class TimeSeries:
 
 		traj_list_w_noise = traj_list.clone()
 		# Dimension [:,:,0] is a time dimension -- do not add noise to that
-		traj_list_w_noise[:,1:,1] += noise_weight * noise
+		traj_list_w_noise[:,1:,0] += noise_weight * noise
 		return traj_list_w_noise
+
 
 
 class Periodic_1d(TimeSeries):
 	def __init__(self, device = torch.device("cpu"), 
-		init_freq = 0.5, init_amplitude = 1.,
+		init_freq = 0.3, init_amplitude = 1.,
 		final_amplitude = 10., final_freq = 1., 
 		z0 = 0.):
 		"""
@@ -101,14 +103,18 @@ class Periodic_1d(TimeSeries):
 		self.final_freq = final_freq
 		self.z0 = z0
 
-	def sample_traj(self, time_steps, n_samples = 1, noise_weight = 1.):
+	def sample_traj(self, time_steps, n_samples = 1, noise_weight = 1.,
+		cut_out_section = None):
 		"""
 		Sample periodic functions. 
 		"""
 		traj_list = []
 		for i in range(n_samples):
-			init_freq = assign_value_or_sample(self.init_freq, [0.5,1.])
-			final_freq = assign_value_or_sample(self.final_freq, [0.5,1.])
+			init_freq = assign_value_or_sample(self.init_freq, [0.4,0.8])
+			if self.final_freq is None:
+				final_freq = init_freq
+			else:
+				final_freq = assign_value_or_sample(self.final_freq, [0.4,0.8])
 			init_amplitude = assign_value_or_sample(self.init_amplitude, [0.,1.])
 			final_amplitude = assign_value_or_sample(self.final_amplitude, [0.,1.])
 
@@ -117,6 +123,9 @@ class Periodic_1d(TimeSeries):
 			traj = generate_periodic(time_steps, init_freq = init_freq, 
 				init_amplitude = init_amplitude, starting_point = noisy_z0, 
 				final_amplitude = final_amplitude, final_freq = final_freq)
+
+			# Cut the time dimension
+			traj = np.expand_dims(traj[:,1:], 0)
 			traj_list.append(traj)
 
 		# shape: [n_samples, n_timesteps, 2]
@@ -124,6 +133,7 @@ class Periodic_1d(TimeSeries):
 		# traj_list[:,:,1] -- values at the time stamps
 		traj_list = np.array(traj_list)
 		traj_list = torch.Tensor().new_tensor(traj_list, device = self.device)
+		traj_list = traj_list.squeeze(1)
 
 		traj_list = self.add_noise(traj_list, time_steps, noise_weight)
 		return traj_list

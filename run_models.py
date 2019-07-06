@@ -140,7 +140,10 @@ if __name__ == '__main__':
 
 	##################################################################
 	# Create the model
-	obsrv_std = 1e-3 if args.dataset == "hopper" else 0.01
+	obsrv_std = 0.01
+	if args.dataset == "hopper":
+		obsrv_std = 1e-3 
+
 	obsrv_std = torch.Tensor([obsrv_std]).to(device)
 
 	z0_prior = Normal(torch.Tensor([0.0]).to(device), torch.Tensor([1.]).to(device))
