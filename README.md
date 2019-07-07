@@ -34,15 +34,16 @@ python3 run_models.py --niters 500 -n 1000 -s 50 -l 10 --dataset periodic  --lat
 python3 run_models.py --niters 300 -n 10000 -l 15 --dataset hopper --latent-ode --rec-dims 30 --gru-units 100 --units 300 --gen-layers 3 --rec-layers 3
 ```
 
-* Physionet
+* Physionet (discretization by 1 min)
 ```
-python3 run_models.py --niters 100 -n 8000 -l 20 --dataset physionet --latent-ode --rec-dims 30 --rec-layers 3 --gen-layers 3 --units 50 --gru-units 50 --quantization 0.1 --classif
-```
+python3 run_models.py --niters 100 -n 8000 -l 20 --dataset physionet --latent-ode --rec-dims 40 --rec-layers 3 --gen-layers 3 --units 50 --gru-units 50 --quantization 0.016 --classif
 
+```
 
 * Human Activity
 ```
 python3 run_models.py --niters 200 -n 10000 -l 15 --dataset activity --latent-ode --rec-dims 100 --rec-layers 4 --gen-layers 2 --units 500 --gru-units 50 --classif  --linear-classif
+
 ```
 
 
