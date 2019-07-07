@@ -100,7 +100,7 @@ def plot_std(ax, traj, traj_std, time_steps, min_y = None, max_y = None, title =
 def plot_vector_field(ax, odefunc, latent_dim, device):
 	# Code borrowed from https://github.com/rtqichen/ffjord/blob/29c016131b702b307ceb05c70c74c6e802bb8a44/diagnostics/viz_toy.py
 	K = 13j
-	y, x = np.mgrid[-4:4:K, -4:4:K]
+	y, x = np.mgrid[-6:6:K, -6:6:K]
 	K = int(K.imag)
 	zs = torch.from_numpy(np.stack([x, y], -1).reshape(K * K, 2)).to(device, torch.float32)
 	if latent_dim > 2:
@@ -122,8 +122,8 @@ def plot_vector_field(ax, odefunc, latent_dim, device):
 	# 	x, y, dydt[:, :, 0], dydt[:, :, 1],
 	# 	np.exp(logmag), cmap="coolwarm", pivot="mid", scale = 100,
 	# )
-	ax.set_xlim(-4, 4)
-	ax.set_ylim(-4, 4)
+	ax.set_xlim(-6, 6)
+	ax.set_ylim(-6, 6)
 	#ax.axis("off")
 
 
