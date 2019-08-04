@@ -132,13 +132,7 @@ class Encoder_z0_RNN(nn.Module):
 		assert(not torch.isnan(data).any())
 		assert(not torch.isnan(time_steps).any())
 
-		if mask is not None:
-			assert(not torch.isnan(mask).any())
-
 		data = data.permute(1,0,2) 
-		if mask is not None:
-			mask = mask.permute(1,0,2) 
-			data = torch.cat((data, mask), -1)
 
 		if run_backwards:
 			# Look at data in the reverse order: from later points to the first
