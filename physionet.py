@@ -344,6 +344,7 @@ def variable_time_collate_fn(batch, args, device = torch.device("cpu"), data_typ
 		"data": combined_vals, 
 		"time_steps": combined_tt,
 		"mask": combined_mask,
+		# Out of 5 label types provided for Physionet, take only the last one -- mortality
 		"labels": combined_labels[:,4]}
 
 	data_dict = utils.split_and_subsample_batch(data_dict, args, data_type = data_type)
