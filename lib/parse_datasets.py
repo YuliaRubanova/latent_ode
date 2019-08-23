@@ -229,7 +229,7 @@ def parse_datasets(args, device):
 	test_dataloader = DataLoader(test_y, batch_size = args.n, shuffle=False,
 		collate_fn= lambda batch: basic_collate_fn(batch, time_steps_extrap, data_type = "test"))
 	
-	data_objects = {"dataset_obj": dataset_obj, 
+	data_objects = {#"dataset_obj": dataset_obj, 
 				"train_dataloader": utils.inf_generator(train_dataloader), 
 				"test_dataloader": utils.inf_generator(test_dataloader),
 				"input_dim": input_dim,

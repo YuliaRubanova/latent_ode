@@ -312,9 +312,9 @@ class VAE_Baseline(nn.Module):
 					mask = batch_dict["mask_predicted_data"])
 
 		# IWAE loss
-		loss = - torch.logsumexp(rec_likelihood + kl_coef * kldiv_z0,0)
+		loss = - torch.logsumexp(rec_likelihood -  kl_coef * kldiv_z0,0)
 		if torch.isnan(loss):
-			loss = - torch.mean(rec_likelihood + kl_coef * kldiv_z0,0)
+			loss = - torch.mean(rec_likelihood - kl_coef * kldiv_z0,0)
 			
 		if self.use_poisson_proc:
 			loss = loss - 0.1 * pois_log_likelihood 
