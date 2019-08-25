@@ -194,6 +194,8 @@ class PhysioNet(object):
 				if record_id in outcomes:
 					# Only training set has labels
 					labels = outcomes[record_id]
+					# Out of 5 label types provided for Physionet, take only the last one -- mortality
+					labels = labels[4]
 
 				patients.append((record_id, tt, vals, mask, labels))
 
@@ -313,7 +315,7 @@ def variable_time_collate_fn(batch, args, device = torch.device("cpu"), data_typ
 	combined_mask = torch.zeros([len(batch), len(combined_tt), D]).to(device)
 	
 	combined_labels = None
-	N_labels = 5
+	N_labels = 1
 
 	combined_labels = torch.zeros(len(batch), N_labels) + torch.tensor(float('nan'))
 	combined_labels = combined_labels.to(device = device)
@@ -344,8 +346,7 @@ def variable_time_collate_fn(batch, args, device = torch.device("cpu"), data_typ
 		"data": combined_vals, 
 		"time_steps": combined_tt,
 		"mask": combined_mask,
-		# Out of 5 label types provided for Physionet, take only the last one -- mortality
-		"labels": combined_labels[:,4]}
+		"labels": combined_labels}
 
 	data_dict = utils.split_and_subsample_batch(data_dict, args, data_type = data_type)
 	return data_dict
