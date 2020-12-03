@@ -573,7 +573,7 @@ def compute_loss_all_batches(model,
 			all_test_labels = all_test_labels.repeat(n_traj_samples,1,1)
 
 
-			idx_not_nan = 1 - torch.isnan(all_test_labels)
+			idx_not_nan = ~torch.isnan(all_test_labels)
 			classif_predictions = classif_predictions[idx_not_nan]
 			all_test_labels = all_test_labels[idx_not_nan]
 
