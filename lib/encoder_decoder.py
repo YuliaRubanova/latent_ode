@@ -88,7 +88,6 @@ class GRU_unit(nn.Module):
 				print("new_y is nan!")
 				print(mask)
 				print(y_mean)
-				print(prev_new_y)
 				exit()
 
 		new_y_std = new_y_std.abs()

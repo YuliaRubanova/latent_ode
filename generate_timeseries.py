@@ -132,7 +132,7 @@ class Periodic_1d(TimeSeries):
 		# traj_list[:,:,0] -- time stamps
 		# traj_list[:,:,1] -- values at the time stamps
 		traj_list = np.array(traj_list)
-		traj_list = torch.Tensor().new_tensor(traj_list, device = self.device)
+		traj_list = torch.tensor(traj_list, device = self.device)
 		traj_list = traj_list.squeeze(1)
 
 		traj_list = self.add_noise(traj_list, time_steps, noise_weight)

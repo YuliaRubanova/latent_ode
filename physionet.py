@@ -97,11 +97,11 @@ class PhysioNet(object):
 			data_file = self.test_file
 		
 		if device == torch.device("cpu"):
-			self.data = torch.load(os.path.join(self.processed_folder, data_file), map_location='cpu')
-			self.labels = torch.load(os.path.join(self.processed_folder, self.label_file), map_location='cpu')
+			self.data = torch.load(os.path.join(self.processed_folder, data_file), map_location='cpu', weights_only=False)
+			self.labels = torch.load(os.path.join(self.processed_folder, self.label_file), map_location='cpu', weights_only=False)
 		else:
-			self.data = torch.load(os.path.join(self.processed_folder, data_file))
-			self.labels = torch.load(os.path.join(self.processed_folder, self.label_file))
+			self.data = torch.load(os.path.join(self.processed_folder, data_file), weights_only=False)
+			self.labels = torch.load(os.path.join(self.processed_folder, self.label_file), weights_only=False)
 
 		if n_samples is not None:
 			self.data = self.data[:n_samples]
@@ -356,4 +356,4 @@ if __name__ == '__main__':
 
 	dataset = PhysioNet('data/physionet', train=False, download=True)
 	dataloader = DataLoader(dataset, batch_size=10, shuffle=True, collate_fn=variable_time_collate_fn)
-	print(dataloader.__iter__().next())
+	print(next(iter(dataloader)))

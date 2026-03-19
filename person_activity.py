@@ -76,9 +76,9 @@ class PersonActivity(object):
 			raise RuntimeError('Dataset not found. You can use download=True to download it')
 		
 		if device == torch.device("cpu"):
-			self.data = torch.load(os.path.join(self.processed_folder, self.data_file), map_location='cpu')
+			self.data = torch.load(os.path.join(self.processed_folder, self.data_file), map_location='cpu', weights_only=False)
 		else:
-			self.data = torch.load(os.path.join(self.processed_folder, self.data_file))
+			self.data = torch.load(os.path.join(self.processed_folder, self.data_file), weights_only=False)
 
 		if n_samples is not None:
 			self.data = self.data[:n_samples]
@@ -295,4 +295,4 @@ if __name__ == '__main__':
 
 	dataset = PersonActivity('data/PersonActivity', download=True)
 	dataloader = DataLoader(dataset, batch_size=30, shuffle=True, collate_fn= variable_time_collate_fn_activity)
-	dataloader.__iter__().next()
+	next(iter(dataloader))

@@ -44,7 +44,7 @@ class Baseline(nn.Module):
 		self.latent_dim = latent_dim
 		self.n_labels = n_labels
 
-		self.obsrv_std = torch.Tensor([obsrv_std]).to(device)
+		self.obsrv_std = torch.tensor([obsrv_std]).to(device)
 		self.device = device
 
 		self.use_binary_classif = use_binary_classif
@@ -118,7 +118,7 @@ class Baseline(nn.Module):
 		# Compute CE loss for binary classification on Physionet
 		# Use only last attribute -- mortatility in the hospital 
 		device = get_device(batch_dict["data_to_predict"])
-		ce_loss = torch.Tensor([0.]).to(device)
+		ce_loss = torch.tensor([0.]).to(device)
 		
 		if (batch_dict["labels"] is not None) and self.use_binary_classif:
 			if (batch_dict["labels"].size(-1) == 1) or (len(batch_dict["labels"].size()) == 1):
@@ -138,7 +138,7 @@ class Baseline(nn.Module):
 				print( batch_dict["labels"])
 				raise Exception("CE loss is Nan!")
 
-		pois_log_likelihood = torch.Tensor([0.]).to(get_device(batch_dict["data_to_predict"]))
+		pois_log_likelihood = torch.tensor([0.]).to(get_device(batch_dict["data_to_predict"]))
 		if self.use_poisson_proc:
 			pois_log_likelihood = compute_poisson_proc_likelihood(
 				batch_dict["data_to_predict"], pred_x, 
@@ -192,7 +192,7 @@ class VAE_Baseline(nn.Module):
 		self.device = device
 		self.n_labels = n_labels
 
-		self.obsrv_std = torch.Tensor([obsrv_std]).to(device)
+		self.obsrv_std = torch.tensor([obsrv_std]).to(device)
 
 		self.z0_prior = z0_prior
 		self.use_binary_classif = use_binary_classif
@@ -287,7 +287,7 @@ class VAE_Baseline(nn.Module):
 			batch_dict["data_to_predict"], pred_y,
 			mask = batch_dict["mask_predicted_data"])
 
-		pois_log_likelihood = torch.Tensor([0.]).to(get_device(batch_dict["data_to_predict"]))
+		pois_log_likelihood = torch.tensor([0.]).to(get_device(batch_dict["data_to_predict"]))
 		if self.use_poisson_proc:
 			pois_log_likelihood = compute_poisson_proc_likelihood(
 				batch_dict["data_to_predict"], pred_y, 
@@ -298,7 +298,7 @@ class VAE_Baseline(nn.Module):
 		################################
 		# Compute CE loss for binary classification on Physionet
 		device = get_device(batch_dict["data_to_predict"])
-		ce_loss = torch.Tensor([0.]).to(device)
+		ce_loss = torch.tensor([0.]).to(device)
 		if (batch_dict["labels"] is not None) and self.use_binary_classif:
 
 			if (batch_dict["labels"].size(-1) == 1) or (len(batch_dict["labels"].size()) == 1):
