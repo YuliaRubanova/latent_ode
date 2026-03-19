@@ -12,7 +12,7 @@ import torch.nn as nn
 import lib.utils as utils
 from lib.diffeq_solver import DiffeqSolver
 from generate_timeseries import Periodic_1d
-from torch.distributions import uniform
+
 
 from torch.utils.data import DataLoader
 from mujoco_physics import HopperPhysics

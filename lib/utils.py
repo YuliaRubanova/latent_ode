@@ -252,7 +252,7 @@ def get_ckpt_model(ckpt_path, model, device):
 	if not os.path.exists(ckpt_path):
 		raise Exception("Checkpoint " + ckpt_path + " does not exist.")
 	# Load checkpoint.
-	checkpt = torch.load(ckpt_path)
+	checkpt = torch.load(ckpt_path, weights_only=False)
 	ckpt_args = checkpt['args']
 	state_dict = checkpt['state_dict']
 	model_dict = model.state_dict()
