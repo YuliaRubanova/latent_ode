@@ -207,7 +207,7 @@ class Visualizations():
 		z0_grid = z0_grid.to(get_device(data))
 
 		if model.latent_dim > 2:
-			z0_grid = torch.cat((z0_grid, torch.zeros(z0_grid.size(0), model.latent_dim-2)), 1)
+			z0_grid = torch.cat((z0_grid, torch.zeros(z0_grid.size(0), model.latent_dim-2, device=z0_grid.device)), 1)
 
 		if model.use_poisson_proc:
 			n_traj, n_dims = z0_grid.size()
